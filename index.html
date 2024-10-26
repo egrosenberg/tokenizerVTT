@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Tokenizer V4.0</title>
+    <meta name="Description" content="Easily create high-quality and breathtaking virtual tabletop tokens for your D&D, Pathfinder, or other TTRPG campaigns on Roll20, Foundry, or other service.">
+    <meta name="Keywords" content="D&D, Dungeons and Dragons, Token Stamp, Tokenizer, VTT, Virtual Tabletop, Tokens, Pathfinder, P2E, Pathfinder 2nd Edition, Pathfinder 2E, art, Token Creator, Foundry, FoundryVTT, Roll20, Foundry Virtual Tabletop">
+    <meta http-equiv="content-language" content="en-US">
+    <link rel="stylesheet" href="style.css">
+    <script src="../js/jquery-3.7.1.js"></script>
+    <script src="context_blender.js"></script>
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Tokenizer V4.0"/>
+    <meta name="twitter:description" content="Easily create high-quality virtual tabletop tokens for your D&D, Pathfinder, or other TTRPG campaigns on Roll20, Foundry, or other service."/>
+    <meta property="og:url" content="https://crowsnest.me/tokenizer"/>
+</head>
+
+<body>
+    <div id="circular-cursor"></div>
+    <div class="heading">
+        <h1>Tokenizer v4</h1>
+    </div>
+    <div class="content">
+        <span class="iblock">
+            <label for="fileInput">Upload Token Art:</label>
+            <br/>
+            <input type="file" id="fileInput" accept="image/*">
+        </span>
+        <span class="iblock">
+            <label >Gradient Colors:</label>
+            <br/>
+            <input type="color" id="color1" value="#ffdd00">
+            <input type="color" id="color2" value="#328400">
+        </span>
+        <!---
+        <span class="iblock">
+            <label >Background:</label>
+            <br/>
+            <input type="color" id="colorB" value="#ffffff">
+        </span>
+        --->
+        <span class="iblock">
+            <label for="color2">Shadow Radius:</label>
+            <input type="number" id="blur_input" value="0" min="0" max="15" step="5">
+            <div style="padding-bottom: 15px">
+                (may cause performance issues)
+            </div>
+        </span>
+        <span class="iblock">
+            <label for="ring_count">Rings:</label>
+            <select id="ring_count">
+                <option value = "1">1</option>
+                <option value = "2">2</option>
+            </select>
+            <br/>
+            <label for="border_type">Border Style:</label>
+            <select id="border_type">
+                <option value = "ring">Circle</option>
+                <option value = "square">Square</option>
+            </select>
+        </span>
+        <br/>
+        <div style="padding: 20px">
+            <span class="iblock" id="edit-block" style="align: center">
+                <div style="text-align: right" >
+                    <label for="erase_mode">Eraser:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="erase_mode">
+                        <span class="toggleSlider"></span>
+                    </label>
+                    &emsp;
+                    <label for="slider1">Brush Radius:</label>
+                    <input type="range" id="brush_slider" class="slider horizontal small" value="50">
+                    &emsp;
+                    <button id="clear_whiteboard">Clear Mask</button>
+                    <br/>
+                    <label for="slider1">Image Scale:</label>
+                    <input type="range" id="slider1" class="slider horizontal" value="50">
+                    <br/>
+                    <label for="slider2">Pan Horizontal:</label>
+                    <input type="range" id="slider2" class="slider horizontal" value="50">
+                    <br/>
+                </div>
+                <div style="text-align: right;">
+                    <span>
+                        <label for="slider3" class="vertical" style="writing-mode: sideways-lr; text-orientation: mixed; padding-bottom: 180px; padding-right: 10px;">Pan Vertical:</label>
+                        <input type="range" id="slider3" class="slider vertical" orient="vertical" value="50">
+                    </span>
+                    <span class="underlay" id="underlay">
+                        <canvas id="canvas" width="500" height="500" class="overlay"></canvas>
+                        <canvas id="canvas_draw" width="500" height="500" class="overlay"></canvas>
+                        <canvas id="canvas_overlay" width="500" height="500" class="overlay"></canvas>
+                    </span>
+                </div>
+                <label for="canvas_size_input">Canvas Size: </label>
+                <input type="number" id="canvas_size_input" min="250" max="1000" value="500" step="250">
+                &emsp;
+                <button id="tokenize_button">Create Token</button>
+            </span>
+            <span class="iblock" id="preview-block">
+                <div style="height: 108px;">
+                    <h1>Token Preview:</h1>
+                </div>
+                <canvas id="canvas_fin" width="500" height="500"></canvas>
+                <br/>
+                <label for="image_size_dropdown">Image Size: </label>
+                <select id="image_size_dropdown">
+                    <option value = "1000">1000px</option>
+                    <option value = "750">750px</option>
+                    <option value = "500">500px</option>
+                    <option value = "250">250px</option>
+                </select>
+                &emsp;
+                <label for="file_type_dropdown">File Type: </label>
+                <select id="file_type_dropdown">
+                    <option value = "image/webp">.webp</option>
+                    <option value = "image/png">.png</option>
+                </select>
+                &emsp;
+                <button id="save_image_button">Save Image</button>
+            </span>
+        </div>
+        <br/>
+        <span class="iblock" style="text-align: left;line-height: 1.5">
+            <b>Instructions for use:</b>
+            <br/>
+            1. Upload token art by clicking 'browse' or dragging and dropping an image file onto the button
+            <br/>
+            2. Set gradient colors by clicking on the colored rectangles
+            <br/>
+            3. Either toggle the 'double-ring' mode on or off (to you preference). This can add a second, thinner ring to the token.
+            <br/>
+            4. Scale the art to a size of your liking with the 'Image Scale' slider.
+            <br/>
+            5. Pan the art to a position you like with the 'Pan Horizontal' and 'Pan Vertical' sliders.
+            <br/>
+            6. (optional) Draw on an image mask with your mouse let the art pop over the token frame.
+            <br/>&emsp;You can toggle the eraser mode in order to erase parts of the mask you drew.
+            <br/>
+            7. (optional) Set the shadow radius.
+            <br/>&emsp;(WARNING: this can be computationally intensive and will slow down render times significantly, do this only after you are sure you have tested and are happy with all other settings).
+            <br/>
+            8. Click the 'Create Token' button.
+            <br/>
+            9. If you are happy with the result, set the Image Size and File Type and click 'Save Image'
+            <br/><br/>
+            <b>Helpful tips:</b>
+            <br/>
+            You may need to unset/reset the 'Eraser' and 'Double Ring' toggles if your web browser kept the position on page reload.
+            <br/><br/>
+            You can change the brush size for masking with the appropriate slider. If you want a fresh start, you can click the 'Clear Mask' button.
+            <br/><br/>
+            You can set the size of the editing and preview canvases by changing the 'Canvas Size' value. This may cause the website to look strange, but it can help with higher precision masking.
+            <br/><br/>
+            Exporting as .webp will usually result in smaller file sizes.
+        </span>
+        <br/><br/>
+        <span class="iblock">
+            <b>Credits:</b><br/>
+            Credit to the wonderful <a target="_blank" href="https://github.com/Phrogz">Gavin Kistner</a> for his creation of <a target="_blank" href="https://github.com/Phrogz/context-blender/tree/master">context-blender</a>, the technology that makes the dynamic creation of the token ring possible. <a target="_blank" href="license/context-blender.txt">(license)</a>
+        </span>
+    </div>
+    <center>
+    </center>
+    <script src="image_manip.js"></script>
+</body>
+</html>

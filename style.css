@@ -1,0 +1,284 @@
+html
+{
+  overflow: scroll;
+  overflow-x: hidden;
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+}
+::-webkit-scrollbar
+{
+  width: 0;  /* Remove scrollbar space */
+  background: transparent;  /* Optional: just make scrollbar invisible */
+}
+
+body
+{
+  padding: 0px;
+  margin: 0px;
+  font-family: "Open Sans", sans-serif;
+  color: white;
+  background-color: rgb(70, 74, 104);
+  height: 100%;
+  width: 100%;
+  background:url(../img/vesper.webp) no-repeat center fixed;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  cursor: default;
+}
+
+body.waiting * { cursor: wait; }
+
+h1
+{
+  font-size: 2.5em;
+  text-align: center;
+  margin: 0px;
+  padding: 0px;
+}
+
+label
+{
+  text-align: center;
+  color: white;
+  font-size: 1.5em;
+  font-family: "Open Sans", sans-serif;
+  line-height: 1.5;
+  font-weight: 100;
+}
+h2
+{
+  text-align: center;
+  color: white;
+  font-size: 1.5em;
+  padding: 0px;
+  font-family: "Open Sans", sans-serif;
+  line-height: 1.5;
+  font-weight: 100;
+}
+
+select, button, input
+{
+  font-size: 1.2em;
+  padding: 0px;
+  border-radius: 6px;
+  text-align: center;
+  background-color: rgba(14,14,14,0.70);
+  outline: medium;
+  outline-color: white;
+  color: white;
+}
+button, select
+{
+    padding: 3px;
+}
+input[type=checkbox]
+{
+  padding: 10px;
+}
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.slidecontainer {
+  width: 100%; /* Width of the outside container */
+}
+
+/* Slider style */
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  outline: none; /* Remove outline */
+  opacity: 0.9; /* Set transparency (for mouse-over effects on hover) */
+  background-color: rgba(99,99,99,0.70);
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+  height: 20px;
+}
+.slider.horizontal.small
+{
+  width: 200px !important;
+  height: 20px; /* Specified height */
+}
+.slider.horizontal
+{
+  width: 500px;
+  height: 20px; /* Specified height */
+}
+.slider.vertical
+{
+  direction: rtl;
+  writing-mode: vertical-lr;
+  appearance: slider-vertical;
+  appearance: slider-vertical;
+  width: 20px; /* Full-width */
+  height: 500px; /* Specified height */
+}
+
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: white; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: white; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+/* inline block span */
+span.iblock
+{
+  vertical-align:middle;
+  display: inline-block;
+  padding: 10px;
+  background-color: rgba(14,14,14,0.70);
+  border: thin solid white;
+  border-radius: 10px;
+}
+
+.output
+{
+  font-size: 1.5em;
+}
+
+canvas
+{
+  border: thin solid white;
+}
+img
+{
+  padding: 15px;
+}
+a
+{
+  color: aqua
+}
+
+.content
+{
+  margin-top: 10em;
+  text-align: center;
+  position: static;
+}
+.heading
+{
+  position: fixed;
+  top: 0;
+  width: 100VW;
+  padding: 10px;
+  margin: 0px;
+  background-color: rgba(14,14,14,0.80);
+  border-bottom: 0.125em solid white;
+  z-index: 4;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+/* The slider */
+.toggleSlider
+{
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.toggleSlider:before
+{
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+.underlay
+{
+  display: inline-block;
+  position: relative;
+  cursor: crosshair;
+  width: 500px;
+  height: 500px;
+  border: thin solid white;
+}
+.overlay
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+input:checked + .toggleSlider
+{
+  background-color: coral;
+}
+
+input:focus + .toggleSlider
+{
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .toggleSlider:before
+{
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Style your custom circular cursor. */
+#circular-cursor
+{
+  pointer-events: none;
+  background-color: transparent;
+  border:1px solid white;
+  height:5px;
+  width:5px;
+  border-radius:50%;
+  position: absolute;
+  z-index: 10;
+  mix-blend-mode: exclusion;
+}
+
+#canvas_draw
+{
+  opacity: 100%;
+  mix-blend-mode: exclusion;
+  z-index: 2;
+}
+#canvas_overlay
+{
+    z-index: 1;
+    mix-blend-mode: difference;
+}
