@@ -435,10 +435,10 @@ async function tokenize()
     tempPeekCanvas.width = img_s;
     tempPeekCanvas.height = img_s;
     let tempPeekContext = tempPeekCanvas.getContext('2d');
-    tempPeekContext.putImageData(peek_context.getImageData(0, 0, peek_canvas.width, peek_canvas.height), 0, 0);
+    await displayArt(tempPeekCanvas, 1.0, 1);
     
     // clip token art onto whiteboard
-    clipOnto(token_art_context, tempPeekContext, img_s, img_s);
+    clipOnto(token_art_context, tempPeekContext, tempPeekCanvas.width, tempPeekCanvas.height);
     
     // create a temporary clone of peek for drop shadow
     let peekShadowCanvas = document.createElement('canvas');
@@ -534,13 +534,30 @@ async function displayArt(displayCan, relative_scale = 1.0, mode = 0)
     centerArt(displayCan, relative_scale);
     
     
-    let offsetX = (art_offset_x + art_offset_user_x * relative_scale);
-    let offsetY = (art_offset_y + art_offset_user_y * relative_scale);
+    let offsetX;
+    let offsetY;
     
     //console.log(`Img Width ${art_width*scale*relative_scale}, Canvas Width ${displayCan.width}, User Offset ${art_offset_user_x}, Offset_X ${offsetX}, Relative Scale ${relative_scale}`);
     
     // choose which canvas to draw from
-    let can = (mode == 0) ? art_canvas : peek_canvas;
+    let can;
+    
+    if (mode == 0)
+    {
+        offsetX = (art_offset_x + art_offset_user_x * relative_scale);
+        offsetY = (art_offset_y + art_offset_user_y * relative_scale);
+        can = art_canvas;
+    }
+    else if (mode == 1)
+    {
+        offsetX = (art_offset_x + art_offset_user_x * relative_scale);
+        offsetY = (art_offset_y + art_offset_user_y * relative_scale);
+        can = peek_canvas;
+    }
+    else
+    {
+        console.log('ERROR: invalid mode for displayArt')
+    }
     
     let tmpImg = new Image();
     const promise = new Promise ( resolve =>
@@ -565,7 +582,9 @@ async function displayPreview()
     // draw preview
     const previewCan = document.getElementById(can_in_id);
     const previewCtx = previewCan.getContext('2d');
-    displayArt(previewCan, rel_scale);
+    await displayArt(previewCan, rel_scale);
+    const whiteboardCan = document.getElementById(whiteboard_id);
+    await displayArt(whiteboardCan, rel_scale, 1);
     // draw overlay
     let ringCan;
     if (document.getElementById(ring_count_id).value == '1')
@@ -610,10 +629,6 @@ document.getElementById(file_id).addEventListener('change', function(event) {
             img.onload = function()
             {
                 resetSliders();
-                document.getElementById(whiteboard_id)
-                    .getContext('2d')
-                    .clearRect(0, 0, img_s, img_s);
-                peek_context.clearRect(0, 0, peek_canvas.width, peek_canvas.height);
                 // calculate apropriate scale to fit
                 art_width = img.naturalWidth;
                 art_height = img.naturalHeight;
@@ -631,7 +646,10 @@ document.getElementById(file_id).addEventListener('change', function(event) {
                 // update peek canvas
                 peek_canvas.width = img.naturalWidth;
                 peek_canvas.height = img.naturalHeight;
-                peek_context.fillRect(0,0,peek_canvas.width,peek_canvas.height);
+                peek_context.clearRect(0,0,peek_canvas.width,peek_canvas.height);
+                document.getElementById(whiteboard_id)
+                    .getContext('2d')
+                    .clearRect(0, 0, img_s*rel_scale, img_s*rel_scale);
                 
                 displayPreview();
             };
@@ -821,8 +839,6 @@ $(document).ready(function() {
         whiteboardCtx.clearRect(0, 0, whiteboard.width, whiteboard.height);
         peek_context.clearRect(0, 0, peek_canvas.width, peek_canvas.height);
     });
-    //whiteboardCtx.fillStyle = "#fff";
-    //whiteboardCtx.fillRect(0, 0, whiteboard.width, whiteboard.height);
 	
     // Mouse Event Handlers
 	if(whiteboard){
@@ -833,32 +849,28 @@ $(document).ready(function() {
 		$(board_frame)
 		.mousedown(function(e)
         {
+            // toggle mouse_down
 			isDown = true;
-			//whiteboardCtx.beginPath();
+            
+            // calculate in-canvas position
 			canvasX = e.pageX - board_frame.offsetLeft;
 			canvasY = e.pageY - board_frame.offsetTop;
-			//whiteboardCtx.moveTo(canvasX, canvasY);
-            //// move on hidden canvas
-            //let scale = 1/rel_scale;
-			//peek_context.beginPath();
-			//peek_context.moveTo(canvasX*scale, canvasY*scale);
-			//whiteboardCtx.strokeStyle = "#fff";
-			//whiteboardCtx.lineWidth = brush_size;
-            //whiteboardCtx.lineTo(canvasX, canvasY);
-			//whiteboardCtx.stroke();
+            
+            // draw on main canvas
             whiteboardCtx.fillStyle = "#fff";
             whiteboardCtx.beginPath();
             whiteboardCtx.arc(canvasX, canvasY, brush_size, 0, 2 * Math.PI);
             whiteboardCtx.fill();
+            
+            // calculate hidden canvas position / brush size
+            let scale = 1/rel_scale/art_base_scale;
+            let x = ((-art_offset_x - art_offset_user_x + canvasX) * scale);
+            let y = ((-art_offset_y - art_offset_user_y + canvasY) * scale);
+            
             // draw on hidden canvas
-			//peek_context.strokeStyle = "#fff";
-            let scale = 1/rel_scale;
-			//peek_context.lineWidth = brush_size*scale;
-            //peek_context.lineTo(canvasX*scale, canvasY*scale);
-			//peek_context.stroke();
             peek_context.fillStyle = "#fff";
             peek_context.beginPath();
-            peek_context.arc(canvasX*scale, canvasY*scale, brush_size*scale, 0, 2 * Math.PI);
+            peek_context.arc(x, y, brush_size*scale, 0, 2 * Math.PI);
             peek_context.fill();
 		})
 		.mousemove(function(e)
@@ -868,36 +880,32 @@ $(document).ready(function() {
             document.getElementById('circular-cursor').style.top = `${e.pageY - brush_size}px`
 			if(isDown !== false)
             {
+                // calculate in-canvas position
 				canvasX = e.pageX - board_frame.offsetLeft;
 				canvasY = e.pageY - board_frame.offsetTop;
-				//whiteboardCtx.strokeStyle = "#fff";
-				//whiteboardCtx.lineWidth = brush_size;
-                //whiteboardCtx.lineTo(canvasX, canvasY);
-				//whiteboardCtx.stroke();
+                
+                // draw on main canvas
                 whiteboardCtx.fillStyle = "#fff";
                 whiteboardCtx.beginPath();
                 whiteboardCtx.arc(canvasX, canvasY, brush_size, 0, 2 * Math.PI);
                 whiteboardCtx.fill();
+                
+                // calculate hidden canvas position / brush size
+                let scale = 1/rel_scale/art_base_scale;
+                let x = ((-art_offset_x - art_offset_user_x + canvasX) * scale);
+                let y = ((-art_offset_y - art_offset_user_y + canvasY) * scale);
+                
                 // draw on hidden canvas
-				//peek_context.strokeStyle = "#fff";
-                let scale = 1/rel_scale;
-				//peek_context.lineWidth = brush_size*scale;
-                //peek_context.lineTo(canvasX*scale, canvasY*scale);
-				//peek_context.stroke();
                 peek_context.fillStyle = "#fff";
                 peek_context.beginPath();
-                peek_context.arc(canvasX*scale, canvasY*scale, brush_size*scale, 0, 2 * Math.PI);
+                peek_context.arc(x, y, brush_size*scale, 0, 2 * Math.PI);
                 peek_context.fill();
-                
-                
 			}
 		})
 		.mouseup(function(e)
         {
+            // toggle mouse_down position
 			isDown = false;
-			//whiteboardCtx.closePath();
-            // close path on hidden canvas
-			//peek_context.closePath();
 		});
 	}
 	
