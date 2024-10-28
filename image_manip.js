@@ -838,13 +838,13 @@ $(document).ready(function() {
     // handle setting scale from slider
     $('#'+pan_h_id).change(function()
     {
-        art_offset_user_x = (this.value * 10) - CANV_S;
+        art_offset_user_x = (this.value * 20) - CANV_S;
         displayPreview();
     });
     // handle setting scale from slider
     $('#'+pan_v_id).change(function()
     {
-        art_offset_user_y = ((100 - this.value) * 10) - CANV_S;
+        art_offset_user_y = ((100 - this.value) * 20) - CANV_S;
         displayPreview();
     });
     // number of rings on token (1/2)
