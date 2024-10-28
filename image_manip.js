@@ -20,6 +20,7 @@ const GRADIENT_SCALE = 0.70;
 const GRADIENT_ANGLE = Math.PI/6;
 const RING = 'ring';
 const SQUARE = 'square';
+const UNDO_STACK_SIZE = 5;
 
 
 // Image paths for component images
@@ -110,6 +111,8 @@ const resized_context  = resized_canvas.getContext('2d');
 resized_canvas.width = img_s;
 resized_canvas.height = img_s;
 
+let undo_whiteboard_stack = [];
+let redo_whiteboard_stack = [];
 
 /** 
  * performs an alpha channel mask by pasting the source image
@@ -744,6 +747,87 @@ async function resizeBoards(size)
     displayPreview();
 }
 
+let undoing = false; // track undoing process
+// whiteboard undo
+async function wbUndo()
+{
+    // check if there is anything in history or if currently trying to undo
+    if (undo_whiteboard_stack.length < 1 || undoing)
+    {
+        return;
+    }
+    // mark as in progress
+    undoing = true;
+    
+    // get current peek canvas state for redo
+    let redoCan = document.createElement('canvas');
+    redoCan.width = peek_canvas.width;
+    redoCan.height = peek_canvas.height;
+    let redoCtx = redoCan.getContext('2d')
+    // reansfer peek canvas data to redo canvas
+    redoCtx.putImageData(peek_context.getImageData(0,0,peek_canvas.width,peek_canvas.height),0,0);
+    // add redo canvas to redo stack
+    redo_whiteboard_stack.push(redoCan);
+    // maintain max length of redo stack
+    if (redo_whiteboard_stack.length > UNDO_STACK_SIZE)
+    {
+        redo_whiteboard_stack.shift();
+    }
+    
+    // get image data canvas / data from top of stack
+    const recovCan = undo_whiteboard_stack.pop();
+    const recovCtx = recovCan.getContext('2d');
+    const imgData = recovCtx.getImageData(0, 0, peek_canvas.width, peek_canvas.height);
+    // put old image data to peek canvas
+    peek_context.putImageData(imgData, 0, 0);
+    
+    
+    // redraw preview
+    await displayPreview();
+    
+    // mark as completed
+    undoing = false;
+}
+// whiteboard redo
+async function wbRedo()
+{
+    // check if there is anything in history or if currently trying to undo
+    if (redo_whiteboard_stack.length < 1 || undoing)
+    {
+        return;
+    }
+    // mark as in progress
+    undoing = true;
+    
+    // get current peek canvas state for undo
+    let undoCan = document.createElement('canvas');
+    undoCan.width = peek_canvas.width;
+    undoCan.height = peek_canvas.height;
+    let undoCtx = undoCan.getContext('2d')
+    // reansfer peek canvas data to redo canvas
+    undoCtx.putImageData(peek_context.getImageData(0,0,peek_canvas.width,peek_canvas.height),0,0);
+    // add redo canvas to redo stack
+    undo_whiteboard_stack.push(undoCan);
+    // maintain max length of redo stack
+    if (undo_whiteboard_stack.length > UNDO_STACK_SIZE)
+    {
+        undo_whiteboard_stack.shift();
+    }
+    
+    // get image data canvas / data from top of stack
+    const recovCan = redo_whiteboard_stack.pop();
+    const recovCtx = recovCan.getContext('2d');
+    const imgData = recovCtx.getImageData(0, 0, peek_canvas.width, peek_canvas.height);
+    // put old image data to peek canvas
+    peek_context.putImageData(imgData, 0, 0);
+    
+    // redraw preview
+    await displayPreview();
+    
+    // mark as completed
+    undoing = false;
+}
+
 $(document).ready(function() {
     // handle setting scale from slider
     $('#'+scale_id).change(function()
@@ -826,6 +910,22 @@ $(document).ready(function() {
     // display initial preview
     displayPreview();
     
+    
+    // keybinds code
+    $(document).keydown(function(e)
+    {
+        // redo (ctrl+shift+z)
+        if( e.which === 90 && e.ctrlKey && e.shiftKey )
+        {
+            wbRedo(); 
+        }
+        // undo (ctrl+z)
+        else if( e.which === 90 && e.ctrlKey )
+        {
+            wbUndo();
+        }          
+    }); 
+    
     // whiteboard code
     const whiteboard = document.getElementById(whiteboard_id);
     const board_frame = document.getElementById('underlay');
@@ -847,6 +947,24 @@ $(document).ready(function() {
 		$(board_frame)
 		.mousedown(function(e)
         {
+            // save current whiteboard state
+            // create new canvas to add to queue
+            let stateCan = document.createElement('canvas');
+            stateCan.width = peek_canvas.width;
+            stateCan.height = peek_canvas.height;
+            // copy current canvas
+            stateCan.getContext('2d').putImageData(peek_context.getImageData(0,0,peek_canvas.width,peek_canvas.height),0,0);
+            // push to stack
+            undo_whiteboard_stack.push(stateCan);
+            // delete oldest if exceed max length
+            if (undo_whiteboard_stack.length > UNDO_STACK_SIZE)
+            {
+                undo_whiteboard_stack.shift();
+            }
+            // clear redo stack
+            redo_whiteboard_stack = [];
+            
+            
             // toggle mouse_down
             isDown = true;
             
@@ -918,7 +1036,24 @@ $(document).ready(function() {
 		start: function(e)
         {
 			this.started = true;
-
+            
+            // save current whiteboard state
+            // create new canvas to add to queue
+            let stateCan = document.createElement('canvas');
+            stateCan.width = peek_canvas.width;
+            stateCan.height = peek_canvas.height;
+            // copy current canvas
+            stateCan.getContext('2d').putImageData(peek_context.getImageData(0,0,peek_canvas.width,peek_canvas.height),0,0);
+            // push to stack
+            undo_whiteboard_stack.push(stateCan);
+            // delete oldest if exceed max length
+            if (undo_whiteboard_stack.length > UNDO_STACK_SIZE)
+            {
+                undo_whiteboard_stack.shift();
+            }
+            // clear redo stack
+            redo_whiteboard_stack = [];
+            
 		},
 		move: function(e)
         {
