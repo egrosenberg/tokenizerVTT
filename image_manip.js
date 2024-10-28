@@ -527,18 +527,18 @@ async function displayArt(displayCan, relative_scale = 1.0, mode = 0)
     // clear display canvas
     displayCtx.clearRect(0, 0, displayCan.width, displayCan.height);
     
-    // create temp image so we can scale token art
+    // preserve composite operation
+    let compOp = displayCtx.globalCompositeOperation;
+    // set to draw operation so we can draw
+    displayCtx.globalCompositeOperation = 'source-over';
+    
+    
     let scale = art_base_scale*art_user_scale;
-    // scale art down/up so that it views relative to final
-    const finCanvas = document.getElementById(can_out_id);
     
-    centerArt(displayCan, relative_scale);
-    
+    centerArt();
     
     let offsetX;
     let offsetY;
-    
-    //console.log(`Img Width ${art_width*scale*relative_scale}, Canvas Width ${displayCan.width}, User Offset ${art_offset_user_x}, Offset_X ${offsetX}, Relative Scale ${relative_scale}`);
     
     // choose which canvas to draw from
     let can;
@@ -572,6 +572,8 @@ async function displayArt(displayCan, relative_scale = 1.0, mode = 0)
     });
     
     await promise;
+    // preserve composite operation
+    displayCtx.globalCompositeOperation = compOp;
 }
 
 // display art preview with overlay
