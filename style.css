@@ -211,13 +211,15 @@ a
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
   border-radius: var(--height);
   cursor: pointer;
+  bottom: -8px;
 }
 
 .switch input {
   display: none;
 }
 
-.switch .toggleSlider {
+.switch .toggleSlider
+{
   position: absolute;
   bottom: 0px;
   left: 0;
@@ -227,28 +229,42 @@ a
   background-color: darkcyan;
   transition: all 0.4s ease-in-out;
 }
+/*neutral color pallet*/
+.switch .toggleSlider.neutral
+{
+  background-color: #333;
+}
 
-.switch .toggleSlider::before {
+.switch .toggleSlider::before
+{
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: calc(var(--height));
-  height: calc(var(--height));
+  top: calc(var(--height)*0.1);
+  left: calc(var(--height)*0.1);
+  width: calc(var(--height)*0.8);
+  height: calc(var(--height)*0.8);
   border-radius: calc(var(--height) / 2);
   background-color: #fff;
   transition: all 0.4s ease-in-out;
 }
 
-.switch input:checked+.toggleSlider {
+.switch input:checked+.toggleSlider
+{
   background-color: maroon;
 }
+/*neutral color pallet*/
+.switch input:checked+.toggleSlider.neutral
+{
+  background-color: #333;
+}
 
-.switch input:checked+.toggleSlider::before {
+.switch input:checked+.toggleSlider::before
+{
   transform: translateX(calc(var(--width) - var(--height)));
 }
 
-.switch .toggleSliderLabel {
+.switch .toggleSliderLabel
+{
   position: absolute;
   top: 4px;
   left: 0;
@@ -258,7 +274,8 @@ a
   transition: all 0.4s ease-in-out;
 }
 
-.switch .toggleSliderLabel::after {
+.switch .toggleSliderLabel::after
+{
   content: attr(data-off);
   position: absolute;
   right: 10px;
@@ -267,7 +284,8 @@ a
   transition: all 0.4s ease-in-out;
 }
 
-.switch .toggleSliderLabel::before {
+.switch .toggleSliderLabel::before
+{
   content: attr(data-on);
   position: absolute;
   left: 10px;
@@ -276,11 +294,13 @@ a
   transition: all 0.4s ease-in-out;
 }
 
-.switch input:checked~.toggleSliderLabel::after {
+.switch input:checked~.toggleSliderLabel::after
+{
   opacity: 0;
 }
 
-.switch input:checked~.toggleSliderLabel::before {
+.switch input:checked~.toggleSliderLabel::before
+{
   opacity: 1;
 }
 

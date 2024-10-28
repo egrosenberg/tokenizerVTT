@@ -361,10 +361,10 @@ async function tokenize()
     let bevelCanvas;
     let overshadowCanvas;
     let shadowCanvas;
-    if (document.getElementById(border_style_id).value == RING)
+    if (!document.getElementById(border_style_id).checked)
     {
         // ring
-        if (document.getElementById(ring_count_id).value == '1')
+        if (!document.getElementById(ring_count_id).checked)
         {
             // single
             borderCanvas = await canvasFromPath(single_ring_alpha_path);
@@ -383,7 +383,7 @@ async function tokenize()
     else
     {
         // square
-        if (document.getElementById(ring_count_id).value == '1')
+        if (!document.getElementById(ring_count_id).checked)
         {
             // single
             borderCanvas = await canvasFromPath(single_square_alpha_path);
@@ -413,7 +413,7 @@ async function tokenize()
     
     // draw alpha for cropping token
     alphaContext.fillStyle = '#ffffff';
-    if (document.getElementById(border_style_id).value == RING)
+    if (!document.getElementById(border_style_id).checked)
     {
         alphaContext.arc(img_s/2, img_s/2, img_s*0.49, 0, Math.PI*2);
         alphaContext.fill();
@@ -590,13 +590,13 @@ async function displayPreview()
     await displayArt(whiteboardCan, rel_scale, 1);
     // draw overlay
     let ringCan;
-    if (document.getElementById(ring_count_id).value == '1')
+    if (!document.getElementById(ring_count_id).checked)
     {
-        ringCan = (document.getElementById(border_style_id).value == RING) ? await canvasFromPath(single_ring_overlay_path) : await canvasFromPath(single_square_overlay_path);
+        ringCan = (!document.getElementById(border_style_id).checked) ? await canvasFromPath(single_ring_overlay_path) : await canvasFromPath(single_square_overlay_path);
     }
     else
     {
-        ringCan = (document.getElementById(border_style_id).value == RING) ? await canvasFromPath(double_ring_overlay_path) : await canvasFromPath(double_square_overlay_path);
+        ringCan = (!document.getElementById(border_style_id).checked) ? await canvasFromPath(double_ring_overlay_path) : await canvasFromPath(double_square_overlay_path);
     }
     
     let tmpImg = new Image();

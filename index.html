@@ -48,16 +48,18 @@
         </span>
         <span class="iblock">
             <label for="ring_count">Rings:</label>
-            <select id="ring_count">
-                <option value = "1">1</option>
-                <option value = "2">2</option>
-            </select>
+            <label class="switch">
+                <input type="checkbox" id="ring_count">
+                <span class="toggleSlider neutral"></span>
+                <span class="toggleSliderLabel" data-on="2" data-off="1"></span>
+            </label>
             <br/>
-            <label for="border_type">Border Style:</label>
-            <select id="border_type">
-                <option value = "ring">Circle</option>
-                <option value = "square">Square</option>
-            </select>
+            <label for="border_type">Border:</label>
+            <label class="switch">
+                <input type="checkbox" id="border_type">
+                <span class="toggleSlider neutral"></span>
+                <span class="toggleSliderLabel" data-on="square" data-off="circle"></span>
+            </label>
         </span>
         <br/>
         <div style="padding: 20px">
