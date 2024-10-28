@@ -1,5 +1,9 @@
 html
 {
+  /* Disable selecting (prevents compatibility issues) */
+  -webkit-touch-callout: none; /* iOS Safari */
+  
+  
   overflow: scroll;
   overflow-x: hidden;
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
@@ -108,7 +112,6 @@ input[type=number]::-webkit-inner-spin-button {
 {
   direction: rtl;
   writing-mode: vertical-lr;
-  appearance: slider-vertical;
   appearance: slider-vertical;
   width: 20px; /* Full-width */
   height: 500px; /* Specified height */

@@ -348,6 +348,8 @@ async function tokenize()
     // set cursor to loading
     document.body.className = 'waiting';
     
+    await displayPreview();
+    
     // create canvases for all components
     let alphaCanvas = document.createElement('canvas');
     alphaCanvas.width = img_s;
@@ -576,9 +578,6 @@ async function displayArt(displayCan, relative_scale = 1.0, mode = 0)
 // display art preview with overlay
 async function displayPreview()
 {
-    // set cursor to loading
-    document.body.className = 'waiting';
-    
     // draw preview
     const previewCan = document.getElementById(can_in_id);
     const previewCtx = previewCan.getContext('2d');
@@ -613,9 +612,6 @@ async function displayPreview()
     await imgPromise;
     
     ringCan.remove();
-    
-    // set cursor back to normal
-    document.body.className = '';
 }
 
 // file input handling
@@ -850,11 +846,11 @@ $(document).ready(function() {
 		.mousedown(function(e)
         {
             // toggle mouse_down
-			isDown = true;
+            isDown = true;
             
             // calculate in-canvas position
-			canvasX = e.pageX - board_frame.offsetLeft;
-			canvasY = e.pageY - board_frame.offsetTop;
+            canvasX = e.pageX - board_frame.offsetLeft;
+            canvasY = e.pageY - board_frame.offsetTop;
             
             // draw on main canvas
             whiteboardCtx.fillStyle = "#fff";
@@ -863,9 +859,9 @@ $(document).ready(function() {
             whiteboardCtx.fill();
             
             // calculate hidden canvas position / brush size
-            let scale = 1/rel_scale/art_base_scale;
-            let x = ((-art_offset_x - art_offset_user_x + canvasX) * scale);
-            let y = ((-art_offset_y - art_offset_user_y + canvasY) * scale);
+            let scale = 1/rel_scale/art_base_scale/art_user_scale;
+            let x = ((-art_offset_x + (canvasX - art_offset_user_x*rel_scale)) * scale);
+            let y = ((-art_offset_y + (canvasY - art_offset_user_y*rel_scale)) * scale);
             
             // draw on hidden canvas
             peek_context.fillStyle = "#fff";
@@ -881,8 +877,8 @@ $(document).ready(function() {
 			if(isDown !== false)
             {
                 // calculate in-canvas position
-				canvasX = e.pageX - board_frame.offsetLeft;
-				canvasY = e.pageY - board_frame.offsetTop;
+                canvasX = e.pageX - board_frame.offsetLeft;
+                canvasY = e.pageY - board_frame.offsetTop;
                 
                 // draw on main canvas
                 whiteboardCtx.fillStyle = "#fff";
@@ -891,9 +887,9 @@ $(document).ready(function() {
                 whiteboardCtx.fill();
                 
                 // calculate hidden canvas position / brush size
-                let scale = 1/rel_scale/art_base_scale;
-                let x = ((-art_offset_x - art_offset_user_x + canvasX) * scale);
-                let y = ((-art_offset_y - art_offset_user_y + canvasY) * scale);
+                let scale = 1/rel_scale/art_base_scale/art_user_scale;
+                let x = ((-art_offset_x + (canvasX - art_offset_user_x*rel_scale)) * scale);
+                let y = ((-art_offset_y + (canvasY - art_offset_user_y*rel_scale)) * scale);
                 
                 // draw on hidden canvas
                 peek_context.fillStyle = "#fff";
@@ -912,43 +908,41 @@ $(document).ready(function() {
 	// Touch Events Handlers
 	draw = {
 		started: false,
-		start: function(e) {
-
-			whiteboardCtx.beginPath();
-			whiteboardCtx.moveTo(
-				e.touches[0].pageX,
-				e.touches[0].pageY
-			);
-            // handle hidden campus
-			peek_context.beginPath();
-			peek_context.moveTo(
-				e.touches[0].pageX,
-				e.touches[0].pageY
-			);
-
+		start: function(e)
+        {
 			this.started = true;
 
 		},
-		move: function(e) {
-
-			if (this.started) {
-				whiteboardCtx.lineTo(
-					e.touches[0].pageX,
-					e.touches[0].pageY
-				);
-				whiteboardCtx.strokeStyle = "#fff";
-				whiteboardCtx.lineWidth = brush_size;
-				whiteboardCtx.stroke();
-                // draw on hidden canvas
-                let scale = 1/rel_scale;
-				peek_context.strokeStyle = "#fff";
-				peek_context.lineWidth = brush_size;
-				peek_context.stroke();
+		move: function(e)
+        {
+			if (this.started && e.touches.length < 2)
+            {
+                e.preventDefault();
+                // calculate in-canvas position
+                canvasX = e.pageX - board_frame.offsetLeft;
+                canvasY = e.pageY - board_frame.offsetTop;
                 
+                // draw on main canvas
+                whiteboardCtx.fillStyle = "#fff";
+                whiteboardCtx.beginPath();
+                whiteboardCtx.arc(canvasX, canvasY, brush_size, 0, 2 * Math.PI);
+                whiteboardCtx.fill();
+                
+                // calculate hidden canvas position / brush size
+                let scale = 1/rel_scale/art_base_scale/art_user_scale;
+                let x = ((-art_offset_x + (canvasX - art_offset_user_x*rel_scale)) * scale);
+                let y = ((-art_offset_y + (canvasY - art_offset_user_y*rel_scale)) * scale);
+                
+                // draw on hidden canvas
+                peek_context.fillStyle = "#fff";
+                peek_context.beginPath();
+                peek_context.arc(x, y, brush_size*scale, 0, 2 * Math.PI);
+                peek_context.fill();
 			}
 
 		},
-		end: function(evt) {
+		end: function(evt)
+        {
 			this.started = false;
 		}
 	};
