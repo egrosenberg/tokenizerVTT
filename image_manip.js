@@ -447,7 +447,7 @@ async function tokenize()
     peekShadowCanvas.width = img_s;
     peekShadowCanvas.height = img_s;
     let peekShadowContext = peekShadowCanvas.getContext('2d');
-    peekShadowContext.putImageData(peek_context.getImageData(0, 0, peek_canvas.width, peek_canvas.height), 0, 0);
+    await displayArt(peekShadowCanvas, 1.0, 1);
     // turn shadow layer black
     colorOverlay(peekShadowCanvas, {r:0,g:0,b:0});
     // blur shadow layer to create drop shadow
@@ -507,15 +507,14 @@ async function tokenize()
 }
 
 // function to calculate offsets to center token art
-// @param can_id: id of canvas to set offsets based on
-function centerArt(canvas, scale = 1.0)
+function centerArt()
 {
-    scale *= art_base_scale*art_user_scale;
+    let scale = art_base_scale*art_user_scale;
     let width = art_width*scale;
     let height = art_height*scale;
     
-    art_offset_x = (canvas.width - width)/2;
-    art_offset_y = (canvas.height - height)/2;
+    art_offset_x = (img_s - width)/2;
+    art_offset_y = (img_s - height)/2;
 }
 
 
@@ -546,14 +545,14 @@ async function displayArt(displayCan, relative_scale = 1.0, mode = 0)
     
     if (mode == 0)
     {
-        offsetX = (art_offset_x + art_offset_user_x * relative_scale);
-        offsetY = (art_offset_y + art_offset_user_y * relative_scale);
+        offsetX = (art_offset_x + art_offset_user_x) * relative_scale;
+        offsetY = (art_offset_y + art_offset_user_y) * relative_scale;
         can = art_canvas;
     }
     else if (mode == 1)
     {
-        offsetX = (art_offset_x + art_offset_user_x * relative_scale);
-        offsetY = (art_offset_y + art_offset_user_y * relative_scale);
+        offsetX = (art_offset_x + art_offset_user_x) * relative_scale;
+        offsetY = (art_offset_y + art_offset_user_y) * relative_scale;
         can = peek_canvas;
     }
     else
@@ -834,6 +833,7 @@ $(document).ready(function() {
     {
         whiteboardCtx.clearRect(0, 0, whiteboard.width, whiteboard.height);
         peek_context.clearRect(0, 0, peek_canvas.width, peek_canvas.height);
+        displayPreview();
     });
 	
     // Mouse Event Handlers
@@ -860,8 +860,9 @@ $(document).ready(function() {
             
             // calculate hidden canvas position / brush size
             let scale = 1/rel_scale/art_base_scale/art_user_scale;
-            let x = ((-art_offset_x + (canvasX - art_offset_user_x*rel_scale)) * scale);
-            let y = ((-art_offset_y + (canvasY - art_offset_user_y*rel_scale)) * scale);
+            let x = (canvasX - ((art_offset_user_x + art_offset_x) * rel_scale)) * scale;
+            let y = (canvasY - ((art_offset_user_y + art_offset_y) * rel_scale)) * scale;
+            
             
             // draw on hidden canvas
             peek_context.fillStyle = "#fff";
@@ -888,8 +889,8 @@ $(document).ready(function() {
                 
                 // calculate hidden canvas position / brush size
                 let scale = 1/rel_scale/art_base_scale/art_user_scale;
-                let x = ((-art_offset_x + (canvasX - art_offset_user_x*rel_scale)) * scale);
-                let y = ((-art_offset_y + (canvasY - art_offset_user_y*rel_scale)) * scale);
+                let x = (canvasX - ((art_offset_user_x + art_offset_x) * rel_scale)) * scale;
+                let y = (canvasY - ((art_offset_user_y + art_offset_y) * rel_scale)) * scale;
                 
                 // draw on hidden canvas
                 peek_context.fillStyle = "#fff";
@@ -902,7 +903,11 @@ $(document).ready(function() {
         {
             // toggle mouse_down position
 			isDown = false;
-		});
+		})
+        .mouseleave(function(e)
+        {
+            isDown = false;
+        });
 	}
 	
 	// Touch Events Handlers
@@ -930,8 +935,8 @@ $(document).ready(function() {
                 
                 // calculate hidden canvas position / brush size
                 let scale = 1/rel_scale/art_base_scale/art_user_scale;
-                let x = ((-art_offset_x + (canvasX - art_offset_user_x*rel_scale)) * scale);
-                let y = ((-art_offset_y + (canvasY - art_offset_user_y*rel_scale)) * scale);
+                let x = (canvasX - ((art_offset_user_x + art_offset_x) * rel_scale)) * scale;
+                let y = (canvasY - ((art_offset_user_y + art_offset_y) * rel_scale)) * scale;
                 
                 // draw on hidden canvas
                 peek_context.fillStyle = "#fff";
