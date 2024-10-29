@@ -32,13 +32,16 @@
             <input type="color" id="color1" value="#ffdd00">
             <input type="color" id="color2" value="#328400">
         </span>
-        <!---
         <span class="iblock">
             <label >Background:</label>
             <br/>
-            <input type="color" id="colorB" value="#ffffff">
+            <label class="switch">
+                <input type="checkbox" id="background_toggle">
+                <span class="toggleSlider neutral"></span>
+                <span class="toggleSliderLabel" data-on="on" data-off="off"></span>
+            </label>
+            <input type="color" id="colorB" value="#400000">
         </span>
-        --->
         <span class="iblock">
             <label for="color2">Shadow Radius:</label>
             <input type="number" id="blur_input" value="0" min="0" max="15" step="5">

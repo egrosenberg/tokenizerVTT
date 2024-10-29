@@ -55,6 +55,7 @@ const stone_texture_path = "img/stone_texture.webp";
 // contants for content ids
 const col1_id = 'color1';               // input field for first gradient color
 const col2_id = 'color2';               // input field for second gradient color
+const colBG_id = 'colorB';              // input field for background color
 const file_id = 'fileInput';            // file input field for token art
 const can_in_id = 'canvas';             // canvas to display token art source image
 const can_out_id = 'canvas_fin';        // canvas to display / draw final token
@@ -74,6 +75,7 @@ const tokenize_id = 'tokenize_button';
 const img_size_id = 'image_size_dropdown';
 const canvas_size_id = 'canvas_size_input';
 const border_style_id = 'border_type';
+const bg_toggle_id = 'background_toggle';
 
 let img_s          = IMG_S;
 let canv_s         = CANV_S;
@@ -551,6 +553,12 @@ async function displayArt(displayCan, relative_scale = 1.0, mode = 0)
         offsetX = (art_offset_x + art_offset_user_x) * relative_scale;
         offsetY = (art_offset_y + art_offset_user_y) * relative_scale;
         can = art_canvas;
+        // draw background if toggled on
+        if (document.getElementById(bg_toggle_id).checked)
+        {
+            displayCtx.fillStyle = $('#'+colBG_id).val();
+            displayCtx.fillRect(0,0,displayCan.width,displayCan.height);
+        }
     }
     else if (mode == 1)
     {
@@ -838,13 +846,13 @@ $(document).ready(function() {
     // handle setting scale from slider
     $('#'+pan_h_id).change(function()
     {
-        art_offset_user_x = (this.value * 20) - CANV_S;
+        art_offset_user_x = (this.value - 50) * art_width*art_base_scale*rel_scale*0.02;
         displayPreview();
     });
     // handle setting scale from slider
     $('#'+pan_v_id).change(function()
     {
-        art_offset_user_y = ((100 - this.value) * 20) - CANV_S;
+        art_offset_user_y = ((100 - this.value) - 50) * art_height*art_base_scale*rel_scale*0.02;
         displayPreview();
     });
     // number of rings on token (1/2)
@@ -905,6 +913,14 @@ $(document).ready(function() {
     $('#'+canvas_size_id).change( function()
     {
         resizeBoards(this.value);
+        displayPreview();
+    });
+    $('#'+bg_toggle_id).change(function()
+    {
+        displayPreview();
+    });
+    $('#'+colBG_id).change(function()
+    {
         displayPreview();
     });
     // display initial preview
