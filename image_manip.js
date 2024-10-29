@@ -51,6 +51,7 @@ const double_square_overshadow_path = "img/square/double_overshadow.webp";
 const square_inner_shadow_path = "img/square/inner_shadow.webp";
 // generic
 const stone_texture_path = "img/stone_texture.webp";
+const instructions_path = "img/upload_instructions.webp";
 
 // contants for content ids
 const col1_id = 'color1';               // input field for first gradient color
@@ -76,6 +77,7 @@ const img_size_id = 'image_size_dropdown';
 const canvas_size_id = 'canvas_size_input';
 const border_style_id = 'border_type';
 const bg_toggle_id = 'background_toggle';
+const underlay_id = 'underlay';
 
 let img_s          = IMG_S;
 let canv_s         = CANV_S;
@@ -92,6 +94,8 @@ let brush_size     = 0.5*(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)+MIN_BRUSH_SIZE;
 let blur_radius    = 0;
 
 let whiteboard_erase = false;
+
+let underlay = document.getElementById(underlay_id);
 
 // background / universal canvases
 const art_canvas    = document.createElement('canvas');
@@ -629,7 +633,39 @@ async function displayPreview()
 // file input handling
 document.getElementById(file_id).addEventListener('change', function(event) {
     const file = event.target.files[0];
+    uploadImg(file);
+});
+
+document.getElementById('underlay').addEventListener('drop', function(event)
+{
+    event.preventDefault();
+    uploadImg(event.dataTransfer.files[0]);
+});
+
+
+// Allow Dragging and dropping
+underlay.addEventListener('dragenter', allowDrag);
+underlay.addEventListener('dragover', allowDrag);
+
+function allowDrag(e)
+{
+    if (true)
+    {  // Test that the item being dragged is a valid one
+        e.dataTransfer.dropEffect = 'copy';
+        e.preventDefault();
+    }
+}
+
+function uploadImg(file)
+{
     if (file) {
+        // check file type
+        if (!file.type.startsWith('image'))
+        {
+            console.log('ERROR: invalid file type');
+            return false;
+        }
+        // create file reader
         const reader = new FileReader();
 
         reader.onload = function(e) {
@@ -666,7 +702,22 @@ document.getElementById(file_id).addEventListener('change', function(event) {
 
         reader.readAsDataURL(file);
     }
-});
+    else
+    {
+        console.log('ERROR: no file uploaded');
+        return false;
+    }
+}
+
+// function to instantiate sample image
+async function instantiateImage()
+{
+    let response = await fetch(instructions_path);
+    let data = await response.blob();
+    let metadata = {type: 'image/webp'};
+    let file = new File([data], 'instructions.webp', metadata);
+    uploadImg(file);
+}
 
 // function to save image to png file
 async function saveImage() {
@@ -837,6 +888,8 @@ async function wbRedo()
 }
 
 $(document).ready(function() {
+    instantiateImage();
+    
     // handle setting scale from slider
     $('#'+scale_id).change(function()
     {
