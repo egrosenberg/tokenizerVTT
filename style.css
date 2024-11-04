@@ -29,6 +29,7 @@ body
   background-attachment: fixed;
   background-repeat: no-repeat;
   cursor: default;
+  min-height: 100%;
 }
 
 body.waiting * { cursor: wait; }
@@ -161,7 +162,7 @@ canvas
 }
 img
 {
-  padding: 15px;
+  padding: 0px;
 }
 a
 {
@@ -170,7 +171,7 @@ a
 
 .content
 {
-  margin-top: 10em;
+  padding-top: 10em;
   text-align: center;
   position: static;
 }

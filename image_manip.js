@@ -50,7 +50,6 @@ const double_square_overshadow_path = "img/square/double_overshadow.webp";
 // square generic
 const square_inner_shadow_path = "img/square/inner_shadow.webp";
 // generic
-const stone_texture_path = "img/stone_texture.webp";
 const instructions_path = "img/upload_instructions.webp";
 
 // contants for content ids
@@ -78,6 +77,8 @@ const canvas_size_id = 'canvas_size_input';
 const border_style_id = 'border_type';
 const bg_toggle_id = 'background_toggle';
 const underlay_id = 'underlay';
+const tex_prev_id = 'texture_preview';
+const tex_type_id = 'texture_type';
 
 let img_s          = IMG_S;
 let canv_s         = CANV_S;
@@ -405,7 +406,7 @@ async function tokenize()
         }
         shadowCanvas = await canvasFromPath(square_inner_shadow_path);
     }
-    const texCanvas = await canvasFromPath(stone_texture_path);
+    const texCanvas = await canvasFromPath($('#'+tex_type_id).val()+'.jpg');
     // get contexts for all our component canvases
     const borderContext = borderCanvas.getContext('2d');
     const overshadowContext = overshadowCanvas.getContext('2d');
@@ -976,6 +977,11 @@ $(document).ready(function() {
     {
         displayPreview();
     });
+    // swap texture preview image
+    $('#'+tex_type_id).change(function(e)
+    {
+        document.getElementById(tex_prev_id).src = `${e.target.value}_small.jpg`;
+    });
     // display initial preview
     displayPreview();
     
@@ -1106,6 +1112,10 @@ $(document).ready(function() {
         {
 			this.started = true;
             
+            // move cursor
+            document.getElementById('circular-cursor').style.left = `${e.pageX - brush_size}px`
+            document.getElementById('circular-cursor').style.top = `${e.pageY - brush_size}px`
+            
             // save current whiteboard state
             // create new canvas to add to queue
             let stateCan = document.createElement('canvas');
@@ -1129,6 +1139,11 @@ $(document).ready(function() {
 			if (this.started && e.touches.length < 2)
             {
                 e.preventDefault();
+                
+                // move cursor
+                document.getElementById('circular-cursor').style.left = `${e.pageX - brush_size}px`
+                document.getElementById('circular-cursor').style.top = `${e.pageY - brush_size}px`
+                
                 // calculate in-canvas position
                 canvasX = e.pageX - board_frame.offsetLeft;
                 canvasY = e.pageY - board_frame.offsetTop;

@@ -9,10 +9,12 @@
     <link rel="stylesheet" href="style.css">
     <script src="../js/jquery-3.7.1.js"></script>
     <script src="context_blender.js"></script>
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="TokenizerVTT"/>
     <meta name="twitter:description" content="Easily create high-quality virtual tabletop tokens for your D&D, Pathfinder, or other TTRPG campaigns on Roll20, Foundry, or other service."/>
     <meta property="og:url" content="https://crowsnest.me/tokenizer"/>
+    <meta property="og:image" content="https://crowsnest.me/tokenizer/img/preview.webp" />
+    <meta property="twitter:image" content="https://crowsnest.me/tokenizer/img/preview.webp" />
 </head>
 
 <body>
@@ -64,6 +66,17 @@
                 <span class="toggleSliderLabel" data-on="square" data-off="circle"></span>
             </label>
         </span>
+        <span class="iblock">
+            <label for="texture_type">Frame texture:</label>
+            <br/>
+            <select name="texture_type" id="texture_type" style="position: relative; z-index: 2;">
+                <option value="img/stone_texture">Marble</option>
+                <option value="img/scratched_metal_texture">Metal</option>
+                <option value="img/concrete1_texture">Concrete 1</option>
+                <option value="img/concrete2_texture">Concrete 2</option>
+                <option value="img/concrete3_texture">Concrete 3</option>
+            </select>
+        </span>
         <br/>
         <div style="padding: 20px">
             <span class="iblock" id="edit-block" style="align: center">
@@ -102,7 +115,9 @@
                 &emsp;
                 <button id="tokenize_button">Create Token</button>
             </span>
-            <span class="iblock" id="preview-block">
+            <span class="iblock" id="preview-block" style="position: relative;">
+                <h2 style="text-align: left; position: absolute; top: 15px; left: 15px; z-index: 1; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; margin: 0px;">Texture</h2>
+                <img src="img/stone_texture_small.jpg" id="texture_preview" alt="stone texture" style="text-align: left; position: absolute; top: 10px; left: 10px;">
                 <div style="height: 108px;">
                     <h1>Token Preview:</h1>
                 </div>
