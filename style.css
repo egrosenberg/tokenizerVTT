@@ -141,14 +141,18 @@ input[type=number]::-webkit-inner-spin-button {
 }
 
 /* inline block span */
-span.iblock
+.iblock
 {
-  vertical-align:middle;
   display: inline-block;
   padding: 10px;
   background-color: rgba(14,14,14,0.70);
   border: thin solid white;
   border-radius: 10px;
+}
+
+span.iblock
+{
+  display: inline-block;
 }
 
 .output
@@ -374,4 +378,15 @@ input:checked + .toggleSlider:before
 {
     z-index: 1;
     mix-blend-mode: difference;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    width: calc(100% - 1290px);
+    padding-left: calc(1290px / 2);
+    padding-right: calc(1290px / 2);
+    flex-wrap: wrap;
+    justify-content: center;
+    gap:5px;
 }

@@ -23,18 +23,19 @@
         <a href="/"><h1>TokenizerVTT</h1></a>
     </div>
     <div class="content">
-        <span class="iblock">
+        <div class="row">
+        <div class="iblock">
             <label for="fileInput">Upload Token Art:</label>
             <br/>
             <input type="file" id="fileInput" accept="image/*">
-        </span>
-        <span class="iblock">
+        </div>
+        <div class="iblock">
             <label >Gradient Colors:</label>
             <br/>
             <input type="color" id="color1" value="#ffdd00">
             <input type="color" id="color2" value="#328400">
-        </span>
-        <span class="iblock">
+        </div>
+        <div class="iblock">
             <label >Background:</label>
             <br/>
             <label class="switch">
@@ -43,15 +44,21 @@
                 <span class="toggleSliderLabel" data-on="on" data-off="off"></span>
             </label>
             <input type="color" id="colorB" value="#400000">
-        </span>
-        <span class="iblock">
+        </div>
+        <br>
+        <div class="iblock">
+            <label for="text_input">Token Text:</label>
+            <br/>
+            <input type="text" id="text_input" value="">
+        </div>
+        <div class="iblock">
             <label for="color2">Shadow Radius:</label>
             <input type="number" id="blur_input" value="0" min="0" max="15" step="5">
             <div style="padding-bottom: 15px">
                 (may cause performance issues)
             </div>
-        </span>
-        <span class="iblock">
+        </div>
+        <div class="iblock">
             <label for="ring_count">Rings:</label>
             <label class="switch">
                 <input type="checkbox" id="ring_count">
@@ -65,8 +72,8 @@
                 <span class="toggleSlider neutral"></span>
                 <span class="toggleSliderLabel" data-on="square" data-off="circle"></span>
             </label>
-        </span>
-        <span class="iblock">
+        </div>
+        <div class="iblock">
             <label for="texture_type">Frame texture:</label>
             <br/>
             <select name="texture_type" id="texture_type" style="position: relative; z-index: 2;">
@@ -76,8 +83,8 @@
                 <option value="img/concrete2_texture">Concrete 2</option>
                 <option value="img/concrete3_texture">Concrete 3</option>
             </select>
-        </span>
-        <br/>
+        </div>
+        </div>
         <div style="padding: 20px">
             <span class="iblock" id="edit-block" style="align: center">
                 <div style="text-align: right" >
@@ -179,6 +186,15 @@
             <b>Credits:</b><br/>
             Credit to the wonderful <a target="_blank" href="https://github.com/Phrogz">Gavin Kistner</a> for his creation of <a target="_blank" href="https://github.com/Phrogz/context-blender/tree/master">context-blender</a>, the technology that makes the dynamic creation of the token ring possible. <a target="_blank" href="licenses/context-blender.txt">(license)</a>
         </span>
+        <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+        <script>
+  kofiWidgetOverlay.draw('krostorm', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Support me',
+    'floating-chat.donateButton.background-color': '#fcbf47',
+    'floating-chat.donateButton.text-color': '#323842'
+  });
+        </script>
     </div>
     <center>
     </center>

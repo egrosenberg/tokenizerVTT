@@ -1,4 +1,5 @@
-// ERROR CODEs
+/* eslint-disable no-unused-vars */
+    // ERROR CODEs
 const SIZE_MISMATCH = "ERROR: Size mismatch between blended images"
 const FAILED_LOAD   = "ERROR: Failed to open an image file, link may be broken"
 const NOT_IMG_TYPE  = "ERROR: Provided image data is not requisite image data structure"
@@ -79,6 +80,7 @@ const bg_toggle_id = 'background_toggle';
 const underlay_id = 'underlay';
 const tex_prev_id = 'texture_preview';
 const tex_type_id = 'texture_type';
+const canvas_text_id = 'text_input';
 
 let img_s          = IMG_S;
 let canv_s         = CANV_S;
@@ -326,6 +328,21 @@ async function canvasFromPath(path)
 }
 
 /**
+ * Draws text on a canvas
+ * @param {CanvasRenderingContext2D} canvas to draw on
+ * @param {String} text to draw
+ */
+async function drawText(ctx, text) {
+    ctx.font = "120px serif";
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 15;
+    ctx.textAlign = "center";
+    ctx.strokeText(text, 500, 975);
+    ctx.fillText(text, 500, 975);
+}
+
+/**
  * Function to convert a hex string to css rgb string
  *
  * @param hex: string containing the hex code
@@ -488,6 +505,8 @@ async function tokenize()
     borderContext.blendOnto(token_context, 'normal');
     // paste peek art on top of token
     tempPeekContext.blendOnto(token_context, 'normal');
+    // draw text on canvas
+    drawText(token_context, $(`#${canvas_text_id}`).val());
     // post image to preview
     let previewImg = new Image();
     const previewPromise = new Promise ( resolve =>
