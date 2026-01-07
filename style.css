@@ -140,19 +140,40 @@ input[type=number]::-webkit-inner-spin-button {
   cursor: pointer; /* Cursor on hover */
 }
 
-/* inline block span */
+/* inline block */
 .iblock
 {
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
   padding: 10px;
   background-color: rgba(14,14,14,0.70);
   border: thin solid white;
   border-radius: 10px;
+  justify-content: flex-end;
 }
 
-span.iblock
-{
-  display: inline-block;
+.editors {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.display-block {
+  justify-content: flex-start;
+}
+
+.flexrow {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+
+.flexrow > * {
+  flex: 1;
+}
+
+.flexrow > *:first-child {
+  text-align: right;
 }
 
 .output
@@ -383,9 +404,9 @@ input:checked + .toggleSlider:before
 .row {
     display: flex;
     flex-direction: row;
-    width: calc(100% - 1290px);
-    padding-left: calc(1290px / 2);
-    padding-right: calc(1290px / 2);
+    width: auto;
+    padding-left: calc(50vw - (1290px / 2));
+    padding-right: calc(50vw - (1290px / 2));
     flex-wrap: wrap;
     justify-content: center;
     gap:5px;
