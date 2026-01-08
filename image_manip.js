@@ -128,6 +128,21 @@ let undo_whiteboard_stack = [];
 let redo_whiteboard_stack = [];
 
 /**
+ * Gets scaled width, height, and position for a token canvas
+ * @param {HTMLElement} canvas to base size and coords off of
+ * @returns new x and y anchor (top left) and new scaled width and height
+ */
+function getScaledVars(canvas) {
+  const tokenScale = parseFloat($(`#${token_scale_id}`).val()) * 0.01;
+  const resizeW = Math.round(canvas.width * tokenScale);
+  const resizeH = Math.round(canvas.height * tokenScale);
+  const newX = Math.round((canvas.width - resizeW) / 2);
+  const newY = Math.round((canvas.height - resizeH) / 2);
+
+  return { resizeW, resizeH, newX, newY };
+}
+
+/**
  * performs an alpha channel mask by pasting the source image
  * on top of the destination image (this overwrites the destination)
  *
@@ -294,7 +309,7 @@ function boxBlur(canvas, radius) {
 }
 
 // Function to read image data from file and save it as raw data
-async function canvasFromPath(path) {
+async function canvasFromPath(path, withScale = false) {
   // return value
   var canvas = document.createElement("canvas");
   // create image and set source
@@ -307,7 +322,12 @@ async function canvasFromPath(path) {
       let context = canvas.getContext("2d");
       canvas.width = img.width;
       canvas.height = img.height;
-      context.drawImage(img, 0, 0);
+      if (withScale) {
+        const { newX, newY, resizeW, resizeH } = getScaledVars(canvas);
+        context.drawImage(img, newX, newY, resizeW, resizeH);
+      } else {
+        context.drawImage(img, 0, 0, img.width, img.height);
+      }
       resolve();
     };
     img.src = path;
@@ -358,21 +378,6 @@ function resetSliders() {
     .change();
 }
 
-/**
- * Gets scaled width, height, and position for a token canvas
- * @param {HTMLElement} canvas to base size and coords off of
- * @returns new x and y anchor (top left) and new scaled width and height
- */
-function getScaledVars(canvas) {
-  const tokenScale = parseFloat($(`#${token_scale_id}`).val()) * 0.01;
-  const resizeW = Math.round(canvas.width * tokenScale);
-  const resizeH = Math.round(canvas.height * tokenScale);
-  const newX = Math.round((canvas.width - resizeW) / 2);
-  const newY = Math.round((canvas.height - resizeH) / 2);
-
-  return { resizeW, resizeH, newX, newY };
-}
-
 let tokenizing = false; // bool to prevent trying to render multiple times at once
 // create token
 async function tokenize() {
@@ -399,32 +404,47 @@ async function tokenize() {
     // ring
     if (!document.getElementById(ring_count_id).checked) {
       // single
-      borderCanvas = await canvasFromPath(single_ring_alpha_path);
-      bevelCanvas = await canvasFromPath(single_ring_bevel_path);
-      overshadowCanvas = await canvasFromPath(single_ring_overshadow_path);
+      borderCanvas = await canvasFromPath(single_ring_alpha_path, true);
+      bevelCanvas = await canvasFromPath(single_ring_bevel_path, true);
+      overshadowCanvas = await canvasFromPath(
+        single_ring_overshadow_path,
+        true
+      );
     } else {
       // double
-      borderCanvas = await canvasFromPath(double_ring_alpha_path);
-      bevelCanvas = await canvasFromPath(double_ring_bevel_path);
-      overshadowCanvas = await canvasFromPath(double_ring_overshadow_path);
+      borderCanvas = await canvasFromPath(double_ring_alpha_path, true);
+      bevelCanvas = await canvasFromPath(double_ring_bevel_path, true);
+      overshadowCanvas = await canvasFromPath(
+        double_ring_overshadow_path,
+        true
+      );
     }
-    shadowCanvas = await canvasFromPath(ring_inner_shadow_path);
+    shadowCanvas = await canvasFromPath(ring_inner_shadow_path, true);
   } else {
     // square
     if (!document.getElementById(ring_count_id).checked) {
       // single
-      borderCanvas = await canvasFromPath(single_square_alpha_path);
-      bevelCanvas = await canvasFromPath(single_square_bevel_path);
-      overshadowCanvas = await canvasFromPath(single_square_overshadow_path);
+      borderCanvas = await canvasFromPath(single_square_alpha_path, true);
+      bevelCanvas = await canvasFromPath(single_square_bevel_path, true);
+      overshadowCanvas = await canvasFromPath(
+        single_square_overshadow_path,
+        true
+      );
     } else {
       // double
-      borderCanvas = await canvasFromPath(double_square_alpha_path);
-      bevelCanvas = await canvasFromPath(double_square_bevel_path);
-      overshadowCanvas = await canvasFromPath(double_square_overshadow_path);
+      borderCanvas = await canvasFromPath(double_square_alpha_path, true);
+      bevelCanvas = await canvasFromPath(double_square_bevel_path, true);
+      overshadowCanvas = await canvasFromPath(
+        double_square_overshadow_path,
+        true
+      );
     }
-    shadowCanvas = await canvasFromPath(square_inner_shadow_path);
+    shadowCanvas = await canvasFromPath(square_inner_shadow_path, true);
   }
-  const texCanvas = await canvasFromPath($("#" + tex_type_id).val() + ".jpg");
+  const texCanvas = await canvasFromPath(
+    $(`#${tex_type_id}`).val() + ".jpg",
+    true
+  );
   // get contexts for all our component canvases
   const borderContext = borderCanvas.getContext("2d");
   const overshadowContext = overshadowCanvas.getContext("2d");
@@ -438,11 +458,18 @@ async function tokenize() {
 
   // draw alpha for cropping token
   alphaContext.fillStyle = "#ffffff";
+  const tokenScale = parseFloat($(`#${token_scale_id}`).val()) * 0.01;
   if (!document.getElementById(border_style_id).checked) {
-    alphaContext.arc(img_s / 2, img_s / 2, img_s * 0.49, 0, Math.PI * 2);
+    alphaContext.arc(
+      img_s / 2,
+      img_s / 2,
+      img_s * 0.49 * tokenScale,
+      0,
+      Math.PI * 2
+    );
     alphaContext.fill();
   } else {
-    alphaContext.fillRect(0, 0, img_s, img_s);
+    alphaContext.fillRect(...getScaledVars(alphaContext));
   }
 
   // clear final canvas
@@ -457,8 +484,8 @@ async function tokenize() {
     img_s,
     col1,
     col2,
-    GRADIENT_SCALE,
-    GRADIENT_ANGLE
+    GRADIENT_SCALE * tokenScale,
+    GRADIENT_ANGLE * tokenScale
   );
   const gradientContext = gradientCanvas.getContext("2d");
 
@@ -519,18 +546,12 @@ async function tokenize() {
   drawText(token_context, $(`#${canvas_text_id}`).val());
   // post image to preview
   let previewImg = new Image();
-  const { resizeW, resizeH, newX, newY } = getScaledVars(finCanvas);
+  //   const { resizeW, resizeH, newX, newY } = getScaledVars(finCanvas);
 
-  console.log({
-    resizeW,
-    resizeH,
-    newX,
-    newY,
-  });
   const previewPromise = new Promise((resolve) => {
     previewImg.onload = function () {
       finContext.clearRect(0, 0, finCanvas.width, finCanvas.height);
-      finContext.drawImage(previewImg, newX, newY, resizeW, resizeH);
+      finContext.drawImage(previewImg, 0, 0, finCanvas.width, finCanvas.height);
       resolve();
     };
     previewImg.src = token_canvas.toDataURL();
@@ -647,7 +668,8 @@ async function displayPreview() {
       const overlayCan = document.getElementById(can_overlay_id);
       const overlayCtx = overlayCan.getContext("2d");
       overlayCtx.clearRect(0, 0, overlayCan.width, overlayCan.height);
-      overlayCtx.drawImage(tmpImg, 0, 0, overlayCan.width, overlayCan.height);
+      const { newX, newY, resizeW, resizeH } = getScaledVars(overlayCan);
+      overlayCtx.drawImage(tmpImg, newX, newY, resizeW, resizeH);
       resolve();
     };
     tmpImg.src = ringCan.toDataURL();
@@ -1003,6 +1025,8 @@ $(document).ready(function () {
   $("#" + tex_type_id).change(function (e) {
     document.getElementById(tex_prev_id).src = `${e.target.value}_small.jpg`;
   });
+  // Rerender preview on token frame scale change
+  $(`#${token_scale_id}`).on("change", displayPreview);
   // display initial preview
   displayPreview();
 
